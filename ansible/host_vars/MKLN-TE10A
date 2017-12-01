@@ -1,0 +1,11 @@
+---
+fxp0_re0_ip: 172.16.8.34/24
+fxp0_re1_ip: 172.16.8.4/24
+fxp0_vip_ip: 172.16.8.3/24
+hostname: MKLN-TE10A
+iBGP_full_mesh_participant: true
+loopback_ip: 172.17.2.8
+mgmt_src_address: 172.16.8.3
+model: M320
+route_reflector: false
+site_number: 8

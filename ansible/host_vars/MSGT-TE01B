@@ -1,0 +1,11 @@
+---
+fxp0_re0_ip: 172.16.19.34/24
+fxp0_re1_ip: 172.16.19.4/24
+fxp0_vip_ip: 172.16.19.3/24
+hostname: MSGT-TE01B
+iBGP_full_mesh_participant: true
+loopback_ip: 172.17.2.19
+mgmt_src_address: 172.16.19.3
+model: MX960
+route_reflector: false
+site_number: 19

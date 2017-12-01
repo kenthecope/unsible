@@ -1,0 +1,11 @@
+---
+fxp0_re0_ip: 172.16.50.34/24
+fxp0_re1_ip: 172.16.50.4/24
+fxp0_vip_ip: 172.16.50.3/24
+hostname: MWBN-TE02A
+iBGP_full_mesh_participant: true
+loopback_ip: 172.17.2.50
+mgmt_src_address: 172.16.50.3
+model: MX240
+route_reflector: false
+site_number: 50

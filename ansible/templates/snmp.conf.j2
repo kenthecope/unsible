@@ -1,0 +1,104 @@
+replace: snmp {
+    {% if location is defined %}
+    location "{{ location }}";
+    {% else %}
+    location "{{ inventory_hostname }}";
+    {% endif %}
+    {% if snmp_contact is defined %}
+    contact "{{ snmp_contact }}";
+    {% else %}
+    contact "5TH SIG NMD 565-6913/6914 - FULL - 20150218";
+    {% endif %}
+    interface fxp0.0;
+    /* SNMPv3 used for polling by SPECTRUM */
+    v3 {
+        /* Define SNMPv3 user names and authentication */
+        usm {
+            local-engine {
+                user SNMPv3_RO {
+                    authentication-sha {
+                        authentication-password "{{snmpv3_password}}";
+                    }
+                    privacy-aes128 {
+                        privacy-password "{{snmpv3_password}}";
+                    }
+                }
+                user SNMPv3_RW {
+                    authentication-sha {
+                        authentication-password "{{snmpv3_password}}";
+                    }
+                    privacy-aes128 {
+                        privacy-password "{{snmpv3_password}}";
+                    }
+                }
+            }
+        }
+        /* Define MIB access by SNMPv3 users */
+        vacm {
+            security-to-group {
+                security-model usm {
+                    security-name SNMPv3_RO {
+                        group SNMPv3-GROUPR;
+                    }
+                    security-name SNMPv3_RW {
+                        group SNMPv3-GROUPW;
+                    }
+                }
+            }
+            access {
+                group SNMPv3-GROUPR {
+                    default-context-prefix {
+                        security-model usm {
+                            security-level privacy {
+                                read-view ALL-MIBS;
+                            }
+                        }
+                    }
+                }
+                group SNMPv3-GROUPW {
+                    default-context-prefix {
+                        security-model usm {
+                            security-level privacy {
+                                read-view ALL-MIBS;
+                                write-view ALL-MIBS;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        {% for spectrum_server in spectrum_servers %}
+        target-address SPECTRUM-{{spectrum_server}} {
+            address {{ spectrum_server }};
+            tag-list SPECTRUM;
+            target-parameters SNMPv3;
+        }
+        {% endfor %}
+        target-parameters SNMPv3 {
+            parameters {
+                message-processing-model v3;
+                security-model usm;
+                security-level privacy;
+                security-name SNMPv3_RW;
+            }
+            notify-filter ALL-TRAPS;
+        }
+        notify SPECTRUM {
+            type trap;
+            tag SPECTRUM;
+        }
+    }
+    engine-id {
+        {% set mgmt_octets = mgmt_ip.split('.') %}
+        local {{ mgmt_octets[0] | int * 2**24 + mgmt_octets[1] | int * 2**16 + mgmt_octets[2] | int * 2**8 + mgmt_octets[3] | int }};
+    }
+    /* A view of the entire MIB for use by SPECTRUM */
+    view ALL-MIBS {
+        oid 1 include;
+    }
+    /* Use the Virtual IP used by the master RE as the source for SNMP traps */
+    trap-options {
+        source-address {{ mgmt_ip }};
+    }
+}
+

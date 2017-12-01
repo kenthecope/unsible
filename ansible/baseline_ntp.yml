@@ -1,0 +1,32 @@
+--- 
+- name: Baseline NTP servers
+  hosts: junosdevices
+  roles:
+   - Juniper.junos
+  connection: local
+  gather_facts: no
+  #strategy: debug
+  vars_files:
+   - group_vars/secrets.yml
+
+  tasks:
+  - name: Checking NETCONF connectivity
+    wait_for: host={{ inventory_hostname }} port=830 timeout=5
+
+  - name: Build NTP configlet
+    template: 
+       src: templates/ntp.conf.j2
+       dest: configs/{{ inventory_hostname }}_ntp.conf
+
+  - name: Load Replace NTP Configlet
+    junos_install_config: 
+      host={{ inventory_hostname }}
+      user={{ juniper_user }}
+      passwd={{ juniper_passwd }}
+      file=configs/{{ inventory_hostname }}_ntp.conf
+      comment="Ansible NTP baseline"
+      overwrite=false
+      replace=true
+      logfile=./config.log
+      #update=replace  for newer versions
+

@@ -1,0 +1,7 @@
+interfaces {
+    {% for index in range(0,23) %}
+    ge-0/0/{{index}} {
+            mac aa:bb:cc:dd:ee:{{index}};
+        }
+    {% endfor %}
+}

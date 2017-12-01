@@ -1,0 +1,15 @@
+system {
+    replace: tacplus-server {
+        {% for tacplus_server in tacplus_servers %}
+        {{tacplus_server}} {
+            secret {{ tacplus_secret }};
+            {% if tacplus_timeout is defined %}
+            timeout {{ tacplus_timeout }};
+            {% else %}
+            timeout 5;
+            {% endif %}
+            source-address {{ mgmt_ip }};
+        }
+        {% endfor %}
+    }
+}

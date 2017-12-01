@@ -1,0 +1,34 @@
+system{
+    replace: syslog {
+        user * {
+            any emergency;
+        }
+        {% for syslog_server in syslog_servers %}
+        host {{ syslog_server }} {
+            any info;
+            facility-override local7;
+            source-address {{ mgmt_ip }} ;
+        }
+        {% endfor %}
+        file messages {
+            any notice;
+            archive size 10m files 30;
+        }
+        file infos {
+            any info;
+            archive size 10m files 100;
+        }
+        file major {
+            any error;
+            archive size 5m files 100;
+        }
+        file user-log {
+            interactive-commands any;
+            archive size 5m files 30;
+        }
+        file kernel {
+            kernel any;
+            archive size 10m files 30;
+        }
+    }
+}

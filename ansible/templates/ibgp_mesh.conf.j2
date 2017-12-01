@@ -1,0 +1,11 @@
+protocols {
+    bgp {
+        group iBGP {
+            {% for router, ip_address in router_loopbacks %}
+            {% if ip_address != loopback_ip %}
+            neighbor {{ ip_address }} {
+                description {{host_name}}:{{router}};
+            }
+            {% endif %}
+    }
+}

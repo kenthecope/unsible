@@ -1,0 +1,11 @@
+---
+fxp0_re0_ip: 172.16.45.34/24
+fxp0_re1_ip: 172.16.45.4/24
+fxp0_vip_ip: 172.16.45.3/24
+hostname: MSGT-TE05A
+iBGP_full_mesh_participant: true
+loopback_ip: 172.17.2.45
+mgmt_src_address: 172.16.45.3
+model: MX240
+route_reflector: false
+site_number: 45
