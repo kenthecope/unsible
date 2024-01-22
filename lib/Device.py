@@ -32,13 +32,15 @@ class JunosDevice(object):
         self.devicePassword = userPassword
         self.ip = ip
         self.hostname = None
-        self.timeout = 30
+        self.timeout = 180
         self.device = Device(str(self.ip), user=self.deviceUser, password=self.devicePassword, timeout=self.timeout)
         self.logger = logging.getLogger()
         self.lsp_map = None # a lsp map of the device
 
         # bind a config object from the device
         self.cu = Config(self.device)
+        # set the commit timeout
+        self.cu.timeout = self.timeout
         # put the cu in exclusive mode if possible
         if 'mode' in dir(self.cu):
             self.cu.mode='exclusive'
@@ -438,6 +440,18 @@ class JunosDevice(object):
                 self.error = e
                 if self.print_output:
                     mesg = "Error committing: {}".format(e)
+                    self.ts_print(colorize (mesg, 'red'))
+            except RpcTimeoutError as err:
+                self.failed = True
+                self.error = err
+                if self.print_output:
+                    mesg = "Timeout while committing: {}".format(e)
+                    self.ts_print(colorize (mesg, 'red'))
+            except Exception as err:
+                self.failed = True
+                self.error = err
+                if self.print_output:
+                    mesg = "Error: {}".format(e)
                     self.ts_print(colorize (mesg, 'red'))
             # results should be a boolean
             if results:
