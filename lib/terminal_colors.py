@@ -39,8 +39,8 @@ def pad_ansi_width(text):
    definitions, and if so, returns and adjusted width of the
    text that includes the pad
    """
-   print '\n'*30
-   print "TEXT", text
+   print ('\n'*30)
+   print ("TEXT", text)
    for attribute in dir(bcolors):
        if attribute[:2] != '__':
            my_attr = getattr(bcolors, attribute)

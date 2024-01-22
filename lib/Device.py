@@ -1,3 +1,7 @@
+# 22.01.2024 - updated for python3 
+# 
+# kcope@juniper.net
+#
 from jnpr.junos import Device
 from jnpr.junos.exception import *
 from jnpr.junos.utils.scp import SCP
@@ -21,14 +25,15 @@ class JunosDevice(object):
         Device should be an  IP address object
         """
 
-        self.__version__ = "Revision: 16.11.2017"
+        self.__version__ = "Revision: 24.01.2024"
         self.__author__ = "KLC"
 
         self.deviceUser = user
         self.devicePassword = userPassword
         self.ip = ip
         self.hostname = None
-        self.device = Device(str(self.ip), user=self.deviceUser, password=self.devicePassword)
+        self.timeout = 30
+        self.device = Device(str(self.ip), user=self.deviceUser, password=self.devicePassword, timeout=self.timeout)
         self.logger = logging.getLogger()
         self.lsp_map = None # a lsp map of the device
 
@@ -254,7 +259,7 @@ class JunosDevice(object):
             #sys.stdout.flush()
 
             # get input from the terminal
-            commit = raw_input(mesg)
+            commit = input(mesg)
             if commit.lower() in ['y', 'yes', 'affirmative', 'yep']:
                 confirmed_timer = 0
             elif commit.isdigit():
@@ -396,12 +401,12 @@ class JunosDevice(object):
         Commit with confirmation and chance to rollback
         """
         if not self.yes_to_questions:
-            print "\n"
+            print ("\n")
             mesg = "Commit on {} (yes to commit,".format(self.ip)
             mesg += "integer to commmit confirmed)\n"
             mesg = colorize (mesg, 'bold')
             mesg += colorize( "Proceed?", 'attention' )
-            commit = raw_input(mesg)
+            commit = input(mesg)
             if commit.lower() in ['y', 'yes', 'affirmative', 'yep']:
                 confirmed_timer = 0
             elif commit.isdigit():
@@ -591,7 +596,7 @@ class JunosDevice(object):
             #sys.stdout.flush()
 
             # get input from the terminal
-            commit = raw_input(mesg)
+            commit = input(mesg)
             if not commit.lower() in ['y', 'yes', 'affirmative', 'yep']:
                 self.ts_print(colorize('Aborting file deletion on {}'.format(self.ip), 'cyan'))
                 return False

@@ -1,3 +1,6 @@
+# 24.01.2024 - update to python3
+# kcope@juniper.net
+
 from populate_lsp import populate_lsp_info
 from jnpr.junos.exception import *
 import time
@@ -112,7 +115,7 @@ class LSPDisplay(object):
         f_lsps = []
 
         # parse the lspmaps for lsps
-        for ip, lsp_map in self.lsps.iteritems():
+        for ip, lsp_map in self.lsps.items():
             if lsp_map:
                 for lsp in lsp_map.ingress_lsps:
                     lsps.append(lsp)

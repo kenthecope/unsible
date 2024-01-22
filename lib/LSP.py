@@ -1,3 +1,6 @@
+# 24.01.2024 - update to python3
+# kcope@juniper.net
+
 from netaddr import IPAddress
 from datetime import date
 from datetime import datetime
@@ -141,7 +144,7 @@ class LSPMap(object):
     def status(self):
         # Display LSP status
         # check for a curses display
-        print "STATUS"
+        print ("STATUS")
 
 
     def csv(self):
@@ -160,7 +163,7 @@ class LSPMap(object):
         csv = ""
         for lsp in self.ingress_lsps:
             #print "LSP:", lsp.name, lsp.__dict__
-            for key,val in lsp.__dict__.iteritems():
+            for key,val in lsp.__dict__.items():
                 if key == 'paths':
                     for path in lsp.paths:
                         if path:

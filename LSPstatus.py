@@ -5,6 +5,7 @@ Report on LSP statistics
 kcope@juniper.net
 
 version:
+    - 22.01.2024 - update to python3
     - 08.11.2017 - various bug fixes
     - 23.10.2017 - First functional version
     - 20.09.2017 - Initial version
@@ -13,8 +14,11 @@ TODO:
 """
 
 from jnpr.junos import Device
+from jnpr.junos.exception import *
 from netaddr import IPAddress, valid_ipv4, valid_ipv6
+
 import os
+import inspect
 import getpass
 import sys
 import logging
@@ -23,31 +27,36 @@ import re
 import datetime
 import pprint
 import socket
-import Queue
-from lib.Device import JunosDevice
-from lib.mpls_tables import MPLSLSPTable
-from lib.Unsible import Inventory
-from lib.populate_lsp import populate_lsp_info
-from lib.Status import Status
-from jnpr.junos.exception import *
+import queue
+import threading
+from threading import Thread
+
+# add lib to the sys path for local modules
+filename = inspect.getframeinfo(inspect.currentframe()).filename
+path = os.path.dirname(os.path.abspath(filename))
+lib_path = os.path.join(path, 'lib')
+sys.path.insert(0, lib_path)
+from Device import JunosDevice
+from mpls_tables import MPLSLSPTable
+from Unsible import Inventory
+from populate_lsp import populate_lsp_info
+from Status import Status
+
 import time
 import signal
 import select
 import tty
 import termios
 
-import threading
-from threading import Thread
-from lib.LSPfetcher import LSPfetcher
-#from lib.GetKey import GetKey
+from LSPfetcher import LSPfetcher
 
-from lib.terminal_colors import bcolors
-from lib.terminal_colors import colorize
+from terminal_colors import bcolors
+from terminal_colors import colorize
 
 try:
     import termios
 except:
-    print "This does not work on Windows."
+    print ("This does not work on Windows.")
     sys.exit(0)
 
 
@@ -316,7 +325,7 @@ def main():
                         new = old[:]
                         new[3] |= termios.ECHO
                         termios.tcsetattr(fd, termios.TCSADRAIN, new)
-                        regex = raw_input('\033[?25hEnter new filter:')
+                        regex = input('\033[?25hEnter new filter:')
                         termios.tcsetattr(fd, termios.TCSADRAIN, old)
                         #regex = 'BONK'
                         #hide_cursor()

@@ -5,15 +5,16 @@ Do thinks in an ansible like fasion
 kcope@juniper.net
 
 version:
+    - 22.01.2024 - convert to python3
     - 18.10.2017 - unsible
     - 20.09.2017 - Initial version
 
 TODO:
 """
 
-from jnpr.junos import Device
-from netaddr import IPAddress, valid_ipv4, valid_ipv6
+# std modules
 import os
+import inspect
 import getpass
 import sys
 import logging
@@ -22,15 +23,27 @@ import re
 import datetime
 import pprint
 import socket
-from lib.Device import JunosDevice
-from lib.Unsible import Inventory
-from jnpr.junos.exception import *
 import time
-from lxml import etree
 import getpass
-from lib.terminal_colors import colorize
 
-__version__ = '18.10.2017.01'
+# installed modules
+from jnpr.junos import Device
+from jnpr.junos.exception import *
+from netaddr import IPAddress, valid_ipv4, valid_ipv6
+from lxml import etree
+
+# add lib to the sys path for local modules
+filename = inspect.getframeinfo(inspect.currentframe()).filename
+path = os.path.dirname(os.path.abspath(filename))
+lib_path = os.path.join(path, 'lib')
+sys.path.insert(0, lib_path)
+
+
+from Device import JunosDevice
+from Unsible import Inventory
+from terminal_colors import colorize
+
+__version__ = '22.01.2024.01'
 
 def main():
     # Setup logging
@@ -42,7 +55,7 @@ def main():
     logger.addHandler(file_handler)
     logger.setLevel(logging.ERROR)
 
-    print colorize("Unsible FE ver {} - A Junos PyEZ cli frontend".format(__version__), 'bold')
+    print (colorize("Unsible FE ver {} - A Junos PyEZ cli frontend".format(__version__), 'bold'))
 
     # Command line arguments
     parser = argparse.ArgumentParser(description='Unsible')
@@ -120,9 +133,9 @@ def main():
     if args.inventory_file:
         if os.path.isdir(args.inventory_file):
             ansible_dir = args.inventory_file
-            print "Ansible Inventory dir is {}".format(ansible_dir)
+            print ("Ansible Inventory dir is {}".format(ansible_dir))
         else:
-            print "ERROR: {} is not a valid directory.".format(args.inventory_file)
+            print ("ERROR: {} is not a valid directory.".format(args.inventory_file))
             sys.exit()
 
     # function to load up an unsible inventory
@@ -162,8 +175,8 @@ def main():
             mesg = "Connecting to {} ({})...".format(device.hostname, device.ip)
         else:
             mesg = "Connecting to {} ...".format(device.ip)
-        print '_'*50
-        print colorize(mesg, 'bold')
+        print ('_'*50)
+        print (colorize(mesg, 'bold'))
 
 
     def check_host(host):
@@ -183,8 +196,8 @@ def main():
 
     if args.host:
         if check_host(args.host):
-            print "ARGS.HOST:", args.host
-            print "CHECK_HOST(args.host)", check_host(args.host), type(check_host(args.host))
+            # print ("ARGS.HOST:", args.host)
+            # print ("CHECK_HOST(args.host)", check_host(args.host), type(check_host(args.host)))
             #check_ips.append(check_host(args.host))
             check_ips[check_host(args.host)] = args.host
 
@@ -214,12 +227,12 @@ def main():
     if args.list_hosts:
         # print hosts, then exit
         for ip in check_ips:
-            print ip
+            print (ip)
         return
 
     # a list of devices to operate on
     devices = []
-    for ip, host in check_ips.iteritems():
+    for ip, host in check_ips.items():
         dev = JunosDevice(ip, user=username, userPassword=password  )
         dev.hostname = host
         devices.append(dev)
@@ -235,12 +248,12 @@ def main():
             try:
                 f = open(args.configure, 'r')
             except:
-                print colorize ("Cound't open file {}".format(args.configure), 'red')
+                print (colorize ("Cound't open file {}".format(args.configure), 'red'))
                 return
             config_template = f.read()
             f.close()
         else:
-            print colorize ("File {} not found.".format(args.configure), 'red')
+            print (colorize ("File {} not found.".format(args.configure), 'red'))
             return
         for device in devices:
             connection_attempt(device)
@@ -250,20 +263,20 @@ def main():
             # set a default for the commit timer
             if args.confirmed:
                 device.commit_timer = args.confirmed
-            print "\n"
+            print ("\n")
             name = inventory.resolver(device.ip)
-            print colorize(" "*80, 'reverse')
+            print (colorize(" "*80, 'reverse'))
             if name:
                 title = 'Configuring {} ({})'.format(name, device.ip)
             else:
                 title = 'Configuring {}'.format(device.ip)
             # center the title in a 80 col display
-            padding = (80 - len(title)) / 2
+            padding = int(80 - len(title) / 2)
             title_h = " "*padding +  title
-            while len(title_h) != 80:
+            while len(title_h) < 81:
                  title_h += ' '
-            print colorize(title_h, 'reverse')
-            print colorize(" "*80, 'reverse')
+            print (colorize(title_h, 'reverse'))
+            print (colorize(" "*80, 'reverse'))
 
             result = device.configure_interactive(config_template)
 
@@ -279,7 +292,7 @@ def main():
             prefix = 'unsible'
         if args.output_dir:
             if not os.path.isdir(args.output_dir):
-                print colorize ('Could not find directory {}'.format(args.output_dir), 'red')
+                print (colorize ('Could not find directory {}'.format(args.output_dir), 'red'))
                 return
             else:
                 output_dir = args.output_dir
@@ -296,7 +309,7 @@ def main():
                 else:
                     output_filename = "{}_{}_{}{}".format(prefix, device.ip, mydate, pf)
             else:
-                print colorize ('Need IP or hostname for separate files', 'red')
+                print (colorize ('Need IP or hostname for separate files', 'red'))
                 sys.exit(0)
         else:
             if postfix:
@@ -344,7 +357,7 @@ def main():
     if 'command' in args:
         # reqfuse to do any request commands
         if args.command.strip()[:7] == 'request':
-            print colorize('Cowardly refusing to do any request commands: "{}"!'.format(args.command), 'red')
+            print (colorize('Cowardly refusing to do any request commands: "{}"!'.format(args.command), 'red'))
             sys.exit(0)
 
         # write to file if requested
@@ -372,19 +385,19 @@ def main():
                     write_to_file('No results.\n', prefix=command_prefix,
                                   device=device, header=header )
             except:
-                print colorize('Could not run "{}" on {}'.format(args.command, device.ip), 'red')
+                print (colorize('Could not run "{}" on {}'.format(args.command, device.ip), 'red'))
 
     if 'commit' in args:
         for device in devices:
             connection_attempt(device)
-            #print colorize("Performing a commit on {}:".format(device.ip), 'blue')
+            #print (colorize("Performing a commit on {}:".format(device.ip), 'blue'))
             try:
                 if not device.device.connected:
                     device.open()
                 output = device.commit()
                 device.close()
             except Exception as e:
-                print colorize("Commit on {} failed: {}".format(device.ip, e), 'red')
+                print (colorize("Commit on {} failed: {}".format(device.ip, e), 'red'))
 
     if 'rollback' in args:
         for device in devices:
@@ -399,7 +412,7 @@ def main():
                 output = device.rollback(rollback_num)
                 device.close()
             except:
-                print "Couln't connect to device."
+                print ("Couldn't connect to device.")
 
     if 'copyto' in args:
         for device in devices:
@@ -413,7 +426,7 @@ def main():
                 else:
                     output = device.scp_put(args.source_file)
             except Exception as e:
-                print "Couldn't connect to device.", e
+                print ("Couldn't connect to device.", e)
 
     if 'inventory' in args:
         if not args.output_file:
@@ -423,7 +436,7 @@ def main():
         header = "Chassis Inventory"
         # delete any file that we are going to append to first
         if not args.separate:
-            write_to_file(None, prefix=command_prefix, header=header, 
+            write_to_file(None, prefix=command_prefix, header=header,
                           delete=True, xml=args.xml )
         for device in devices:
             connection_attempt(device)
@@ -436,7 +449,7 @@ def main():
                     xml = False
                 output = device.inventory(xml=xml)
             except Exception as e:
-                print "Couldn't connect to device.", e
+                print ("Couldn't connect to device.", e)
             if device.failed:
                 write_to_file("Failed.\n", prefix=command_prefix,
                               device=device, header=header )
@@ -458,7 +471,7 @@ def main():
                     device.open()
                 output = device.system_storage_cleanup(confirm=args.yes)
             except Exception as e:
-                print "Couldn't connect to device.", e
+                print ("Couldn't connect to device.", e)
 
 
     # close devices
@@ -467,7 +480,7 @@ def main():
         if device.device.connected:
             device.close()
         else:
-            #print colorize("Couldn't close device {}".format(device.ip), 'red')
+            #print (colorize("Couldn't close device {}".format(device.ip), 'red'))
             pass
 
     # list failures
@@ -480,18 +493,18 @@ def main():
 
     # if there were any failures, then report and record them
     if failures:
-        print colorize( "="*80, 'bold')
-        print colorize( "\n\nFAILURES:\n", 'bold')
+        print (colorize( "="*80, 'bold'))
+        print (colorize( "\n\nFAILURES:\n", 'bold'))
         for device in devices:
             if device.failed:
                 if device.error:
-                    print colorize( "FAILURE REASON: {} {}".format(device.ip, device.error), 'red')
+                    print (colorize( "FAILURE REASON: {} {}".format(device.ip, device.error), 'red'))
                 else:
-                    print colorize ("FAILURE: {}".format(device.ip), 'red')
+                    print (colorize ("FAILURE: {}".format(device.ip), 'red'))
                 failed_ips.append(device.ip)
         # write the falures to a file
         if len(failed_ips):
-            print colorize( "Recording failures:", 'bold')
+            print (colorize( "Recording failures:", 'bold'))
             mydate = str(datetime.date.today().isoformat())
             myfile = "failures_" + mydate + '.ips'
             mydir = '/tmp/'
@@ -499,9 +512,8 @@ def main():
             for ip in failed_ips:
                 fail_file.write(str(ip) + '\n')
             fail_file.close()
-            print colorize( "Wrote {} failures to {}".format(len(failed_ips), os.path.join( mydir, myfile )), 'bold')
+            print (colorize( "Wrote {} failures to {}".format(len(failed_ips), os.path.join( mydir, myfile )), 'bold'))
 
-        
 
     logger.debug('----------------------------------END __main__')
 

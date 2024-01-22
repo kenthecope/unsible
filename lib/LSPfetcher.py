@@ -1,4 +1,7 @@
-import Queue
+# 22.01.2024 - update for python3
+# kcope@juniper.net
+
+import queue
 import threading
 from threading import Thread
 import time
@@ -32,20 +35,20 @@ class LSPfetcher(object):
 
         # queues for communicataion between threads
         # devices that need xml stats fetched
-        self.query_jobs = Queue.Queue()
+        self.query_jobs = queue.Queue()
         # devices (and results) of last queiry
-        self.results_jobs = Queue.Queue()
+        self.results_jobs = queue.Queue()
         # devices that are in a waiting state between queries
-        self.sleeper_jobs = Queue.Queue()
+        self.sleeper_jobs = queue.Queue()
 
         # a queue to drop results off in for the caller to use
-        self.output_queue = Queue.Queue()
+        self.output_queue = queue.Queue()
 
         # a queue to display status messages from
-        self.status_queue = Queue.Queue()
+        self.status_queue = queue.Queue()
 
         # a queue to display error messages from
-        self.error_queue = Queue.Queue()
+        self.error_queue = queue.Queue()
 
 
     def sigint_handler(self, signum, frame):

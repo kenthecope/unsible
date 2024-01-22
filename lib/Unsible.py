@@ -1,5 +1,9 @@
 """
+24.01.2024 - update to python3
 10.12.2017 - add host and group variables to inventory
+
+kcope@juniper.net
+
 """
 
 import os
@@ -43,7 +47,7 @@ class Inventory(object):
         # parse the host vars
         for key in self.host_vars:
             if isinstance(self.host_vars[key], dict):
-                for h_key, h_value in self.host_vars[key].iteritems():
+                for h_key, h_value in self.host_vars[key].items():
                     self.add_to_resolver(key, h_value)
 
 
@@ -124,7 +128,7 @@ class Inventory(object):
         parents
         """
         parents = {}
-        for key, value in self.inventory.iteritems():
+        for key, value in self.inventory.items():
             if ':' in key:
                 if key.split(':')[-1] == 'children':
                     new_key = key.split(':')[0]
@@ -166,7 +170,7 @@ class Inventory(object):
             # if we didn't find they key in self.inventory, look for it in the files
             if not found_key:
                 if lookup_val in self.inventory_files:
-                    for key, value in self.inventory_files[lookup_val].iteritems():
+                    for key, value in self.inventory_files[lookup_val].items():
                         # add to main inventory
                         self.inventory[key] = value
 
@@ -240,13 +244,13 @@ class Inventory(object):
             return myinventory
 
         if not self.directory:
-            print "ERROR: ansible inventory directory not set"
+            print ("ERROR: ansible inventory directory not set")
             return False
         else:
             if not os.path.isdir(self.directory):
                 mesg = "ERROR: ansible inventory directory "
                 mesg += "{} does not exist!".format(self.directory)
-                print mesg
+                print (mesg)
                 return False
 
 
@@ -264,7 +268,7 @@ class Inventory(object):
                 file_data.close()
             # create a dictionary for the file contents
             file_dict = {}
-            for key, value in inv_dict(raw_lines).iteritems():
+            for key, value in inv_dict(raw_lines).items():
                 file_dict[key] = value
                 self.inventory[key] = value
             # add the dictionary to self.inventory_files 
