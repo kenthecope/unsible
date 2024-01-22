@@ -287,7 +287,7 @@ class JunosDevice(object):
                         mesg = "Remember to perform another commit or these changes "
                         mesg += "will rollback."
                         self.ts_print(colorize(mesg, 'cyan'))
-                results = self.cu.commit(comment=self.comment, confirm=confirmed_timer)
+                results = self.cu.commit(comment=self.comment, confirm=confirmed_timer, timeout=self.timeout)
             except CommitError as e:
                 self.failed = True
                 self.error = e
@@ -434,7 +434,7 @@ class JunosDevice(object):
                         mesg = "Remember to perform another commit or these changes"
                         mesg += "will rollback."
                         self.ts_print(colorize(mesg, 'cyan'))
-                results = self.cu.commit(comment=self.comment, confirm=confirmed_timer)
+                results = self.cu.commit(comment=self.comment, confirm=confirmed_timer, timeout=self.timeout)
             except CommitError as e:
                 self.failed = True
                 self.error = e
