@@ -158,7 +158,7 @@ class JunosDevice(object):
         if not self.lock():
             return
         try:
-            results = self.cu.commit(comment=self.comment)
+            results = self.cu.commit(comment=self.comment, timeout=self.timeout)
         except CommitError as e:
             if self.print_output:
                self.ts_print(colorize("Commit error!", 'red'))
@@ -445,13 +445,13 @@ class JunosDevice(object):
                 self.failed = True
                 self.error = err
                 if self.print_output:
-                    mesg = "Timeout while committing: {}".format(e)
+                    mesg = "Timeout while committing: {}".format(err)
                     self.ts_print(colorize (mesg, 'red'))
             except Exception as err:
                 self.failed = True
                 self.error = err
                 if self.print_output:
-                    mesg = "Error: {}".format(e)
+                    mesg = "Error: {}".format(err)
                     self.ts_print(colorize (mesg, 'red'))
             # results should be a boolean
             if results:
