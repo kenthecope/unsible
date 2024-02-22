@@ -1,6 +1,0 @@
----
-hostname: MPE1
-iBGP_full_mesh_participant: true
-loopback_ip: 10.0.0.1
-model: vMX
-route_reflector: false

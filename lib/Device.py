@@ -33,7 +33,7 @@ class JunosDevice(object):
         self.ip = ip
         self.hostname = None
         self.timeout = 180
-        self.device = Device(str(self.ip), user=self.deviceUser, password=self.devicePassword, timeout=self.timeout)
+        self.device = Device(str(self.ip), port=22, user=self.deviceUser, password=self.devicePassword, timeout=self.timeout)
         self.logger = logging.getLogger()
         self.lsp_map = None # a lsp map of the device
 
@@ -220,7 +220,7 @@ class JunosDevice(object):
             return False
 
         try:
-            results = self.cu.load(config_template)
+            results = self.cu.load(config_template, merge=True)
         except RuntimeError as e:
             if self.print_output:
                 mesg = "The configuration file had problems and could not be loaded: {}".format(e)
